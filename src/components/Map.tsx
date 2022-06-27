@@ -66,9 +66,9 @@ export default function Map({ route }: MapProps) {
   return (
     <>
       <div ref={mapContainer} id="map-container" className="map-container" style={{
-        border: '1px solid cyan',
-        boxSizing: 'border-box',
-        width: '75%',
+        // border: '1px solid cyan',
+        // boxSizing: 'border-box',
+        width: '100%',
         height: '100%'
       }} />
       { }

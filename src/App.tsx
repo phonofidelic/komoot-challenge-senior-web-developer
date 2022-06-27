@@ -3,6 +3,8 @@ import './App.css';
 import { getMockRoute } from './mock';
 import Map from './components/Map';
 import { Route } from './common/interfaces';
+import { Grid } from '@mui/material';
+
 
 
 function App() {
@@ -21,18 +23,20 @@ function App() {
   if (!mockRoute) return <div>Loading...</div>
 
   return (
-    <div className="App" style={{
-      display: 'flex',
-      width: '100%',
-      height: '100vh'
+    <Grid container style={{
+      color: '#fff',
+      backgroundColor: '#383838',
+      height: '100vh',
+      width: '100%'
     }}>
-      <div className="side-bar" style={{
-        border: '1px solid red',
-        boxSizing: 'border-box',
-        width: '25%'
-      }}>SideBar</div>
-      <Map route={mockRoute} />
-    </div>
+      <Grid item sm={4}>SideBar</Grid>
+      <Grid style={{
+        width: '100%',
+        height: '100%'
+      }} item sm={8}>
+        <Map route={mockRoute} />
+      </Grid>
+    </Grid>
   );
 }
 
