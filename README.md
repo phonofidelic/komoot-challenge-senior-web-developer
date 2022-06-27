@@ -7,13 +7,14 @@
 ## Process
 
 ### Requirements
-* Develop a react app that enables you to plan your cross country run and download it as GPX file.
-  * `Runners` should be able to place `Waypoints` anywhere on the `Map`
-  * `Waypoints` should also be added to added as list items to the `WaypointList`
-  * `Waypoints` should be able to be moved arround on the `Map`
-  * `Waypoints` should be able to be named and re-named
-  * `Waypoints` should be able to be removed
-  * `Waypoints` should be connected 
+"Develop a react app that enables you to plan your cross country run and download it as GPX file."
+- [ ] `Runners` should be able to place `Waypoints` anywhere on the `Map`
+- [ ] `Waypoints` should also be added to added as list items to the `WaypointList`
+- [ ] `Waypoints` should be able to be moved arround on the `Map`
+- [ ] `Waypoints` should be able to be named and re-named
+- [ ] `Waypoints` should be able to be removed
+- [ ] `Waypoints` should be able to be re-ordered
+- [ ] `Waypoints` should be connected to form a `Route`
 
 
 ### UI Components

@@ -1,11 +1,14 @@
 import React, { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl';
+import { Route } from '../common/interfaces';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN || ''
 
-type MapProps = {}
+type MapProps = {
+  route: Route;
+}
 
-export default function Map({ }: MapProps) {
+export default function Map({ route }: MapProps) {
   const mapContainer = useRef(null)
 
   useEffect(() => {

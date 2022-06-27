@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
-
+import { getMockRoute } from './mock';
 import Map from './components/Map';
+import { Route } from './common/interfaces';
 
 
 function App() {
+  const [mockRoute, setMockRouteData] = useState<Route | null>(null)
+
+  useEffect(() => {
+    const getData = async () => {
+      const mockRouteData: Route = await getMockRoute()
+      console.log('mockRouteData:', mockRouteData)
+      setMockRouteData(mockRouteData)
+    }
+    getData()
+  }, [])
+
+
+  if (!mockRoute) return <div>Loading...</div>
 
   return (
     <div className="App" style={{
@@ -17,7 +31,7 @@ function App() {
         boxSizing: 'border-box',
         width: '25%'
       }}>SideBar</div>
-      <Map />
+      <Map route={mockRoute} />
     </div>
   );
 }
