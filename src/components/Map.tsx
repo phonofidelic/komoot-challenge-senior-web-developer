@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react'
+import React, { createRef, useEffect, useRef, forwardRef } from 'react'
+import ReactDOM from 'react-dom/client';
 import mapboxgl from 'mapbox-gl';
 import { Route } from '../common/interfaces';
 
@@ -8,12 +9,24 @@ type MapProps = {
   route: Route;
 }
 
+// function Marker() {
+
+//   return (
+//     <div>marker</div>
+//   )
+// }
+const Marker = forwardRef<HTMLDivElement>((props, ref) => (<div ref={ref}>marker</div>))
+
 export default function Map({ route }: MapProps) {
   const mapContainer = useRef(null)
+  const waypointRefs = useRef([])
 
   useEffect(() => {
     if (!mapContainer.current) return;
 
+    /**
+     * Mapbox initialization
+     */
     const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/phonofidelic/ckn2dzfo22ys217n4be9x5l3e',
@@ -21,6 +34,9 @@ export default function Map({ route }: MapProps) {
       attributionControl: false,
     });
 
+    /**
+     * Get current location and possition the map
+     */
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         console.log('position:', pos);
@@ -32,14 +48,30 @@ export default function Map({ route }: MapProps) {
       }
     );
 
+    map.on('load', () => {
+      for (const [i, waypoint] of route.waypoints.entries()) {
+
+        const markerEl = document.createElement('div')
+        markerEl.className = 'marker'
+        markerEl.innerHTML = String(waypoint.index + 1)
+
+        new mapboxgl.Marker(markerEl)
+          .setLngLat(waypoint.coordinates)
+          .addTo(map)
+      }
+    })
+
     return () => map.remove();
   }, [])
   return (
-    <div ref={mapContainer} id="map-container" className="map-container" style={{
-      border: '1px solid cyan',
-      boxSizing: 'border-box',
-      width: '75%',
-      height: '100%'
-    }} />
+    <>
+      <div ref={mapContainer} id="map-container" className="map-container" style={{
+        border: '1px solid cyan',
+        boxSizing: 'border-box',
+        width: '75%',
+        height: '100%'
+      }} />
+      { }
+    </>
   )
 }

@@ -15,7 +15,8 @@ const generateWaypoints = async (poins: number): Promise<Waypoint[]> => {
   return [
     {
       name: 'Waypoint 1',
-      coordinates: [pos.coords.latitude, pos.coords.longitude],
+      index: 0,
+      coordinates: [pos.coords.longitude, pos.coords.latitude],
       links: []
     }
   ]
