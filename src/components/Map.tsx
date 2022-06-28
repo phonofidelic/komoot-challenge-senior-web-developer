@@ -49,6 +49,37 @@ export default function Map({ route }: MapProps) {
           .setLngLat(waypoint.coordinates)
           .addTo(map)
       }
+
+      let routeCoords = []
+      for (let i = 0; i < route.waypoints.length - 1; i++) {
+        routeCoords.push([route.waypoints[i].coordinates[0], route.waypoints[i].coordinates[1]])
+        routeCoords.push([route.waypoints[i + 1].coordinates[0], route.waypoints[i + 1].coordinates[1]])
+      }
+
+      map.addSource('route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: routeCoords
+          }
+        }
+      })
+      map.addLayer({
+        id: 'route',
+        type: 'line',
+        source: 'route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#1086E8',
+          'line-width': 8
+        }
+      })
     })
 
     return () => map.remove();
