@@ -12,7 +12,7 @@ function App() {
 
   useEffect(() => {
     const getData = async () => {
-      const mockRouteData: Route = await getMockRoute()
+      const mockRouteData: Route = await getMockRoute(5)
       console.log('mockRouteData:', mockRouteData)
       setMockRouteData(mockRouteData)
     }

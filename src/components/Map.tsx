@@ -1,5 +1,4 @@
-import React, { createRef, useEffect, useRef, forwardRef } from 'react'
-import ReactDOM from 'react-dom/client';
+import React, { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl';
 import { Route } from '../common/interfaces';
 
@@ -9,17 +8,8 @@ type MapProps = {
   route: Route;
 }
 
-// function Marker() {
-
-//   return (
-//     <div>marker</div>
-//   )
-// }
-const Marker = forwardRef<HTMLDivElement>((props, ref) => (<div ref={ref}>marker</div>))
-
 export default function Map({ route }: MapProps) {
   const mapContainer = useRef(null)
-  const waypointRefs = useRef([])
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -49,7 +39,7 @@ export default function Map({ route }: MapProps) {
     );
 
     map.on('load', () => {
-      for (const [i, waypoint] of route.waypoints.entries()) {
+      for (const waypoint of route.waypoints) {
 
         const markerEl = document.createElement('div')
         markerEl.className = 'marker'
@@ -62,12 +52,10 @@ export default function Map({ route }: MapProps) {
     })
 
     return () => map.remove();
-  }, [])
+  }, [route.waypoints])
   return (
     <>
       <div ref={mapContainer} id="map-container" className="map-container" style={{
-        // border: '1px solid cyan',
-        // boxSizing: 'border-box',
         width: '100%',
         height: '100%'
       }} />

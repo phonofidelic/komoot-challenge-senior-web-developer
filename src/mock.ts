@@ -1,5 +1,12 @@
 import { Route, Waypoint } from "./common/interfaces";
 
+/**
+ * https://stackoverflow.com/a/1527820
+ */
+function getRandomArbitrary(min: number, max: number) {
+  return Math.random() * (max - min) + min;
+}
+
 const getCurrentPossition = (): Promise<GeolocationPosition> => {
   if (!('geolocation' in navigator)) throw new Error('Geolocation is not supported in this environmnet')
 
@@ -8,21 +15,32 @@ const getCurrentPossition = (): Promise<GeolocationPosition> => {
   })
 }
 
-const generateWaypoints = async (poins: number): Promise<Waypoint[]> => {
-  const pos = await getCurrentPossition()
-  console.log('pos:', pos)
+const generateWaypoints = async (points: number): Promise<Waypoint[]> => {
+  const startPos = await getCurrentPossition()
+  const minDistance = 0.005
+  const maxDistance = 0.01
 
-  return [
-    {
-      name: 'Waypoint 1',
-      index: 0,
-      coordinates: [pos.coords.longitude, pos.coords.latitude],
+  let waypoints: Waypoint[] = []
+
+  for (let i = 0; i < points; i++) {
+    waypoints.push({
+      name: `Waypoint ${i + 1}`,
+      index: i,
+      coordinates: [
+        i === 0
+          ? startPos.coords.longitude
+          : waypoints[i - 1].coordinates[0] + getRandomArbitrary(minDistance, maxDistance) * (Math.random() < 0.5 ? -1 : 1),
+        i === 0
+          ? startPos.coords.latitude
+          : waypoints[i - 1].coordinates[1] + getRandomArbitrary(minDistance, maxDistance) * (Math.random() < 0.5 ? -1 : 1)
+      ],
       links: []
-    }
-  ]
+    })
+  }
+
+  return waypoints
 }
 
 export const getMockRoute = async (waypoints: number = 4): Promise<Route> => ({
-  //@ts-ignore
   waypoints: await generateWaypoints(waypoints)
 })
