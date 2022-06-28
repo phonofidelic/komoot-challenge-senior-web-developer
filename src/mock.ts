@@ -1,9 +1,10 @@
+import { LngLat } from "mapbox-gl";
 import { Route, Waypoint } from "./common/interfaces";
 
 /**
  * https://stackoverflow.com/a/1527820
  */
-function getRandomArbitrary(min: number, max: number) {
+function getRandomArbitrary(min: number, max: number): number {
   return Math.random() * (max - min) + min;
 }
 

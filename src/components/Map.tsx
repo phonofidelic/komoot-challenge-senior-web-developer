@@ -1,76 +1,108 @@
 import React, { useEffect, useRef } from 'react'
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { LngLat, Map as _Map, MapMouseEvent } from 'mapbox-gl';
 import { Route } from '../common/interfaces';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN || ''
 
 type MapProps = {
-  route: Route;
+  onAddWaypoint(coortinagtes: LngLat): Route | undefined
 }
 
-export default function Map({ route }: MapProps) {
+export default function Map({ onAddWaypoint }: MapProps) {
   const mapContainer = useRef(null)
+  const mapRef = useRef<_Map | null>(null)
+
+  const handleDblClick = (event: MapMouseEvent): Route | undefined => {
+    event.preventDefault()
+    console.log('handleDblClick:', event.lngLat)
+    return onAddWaypoint(event.lngLat)
+  }
 
   useEffect(() => {
     if (!mapContainer.current) return;
+    if (!mapRef.current === null) return
 
     /**
      * Mapbox initialization
      */
-    const map = new mapboxgl.Map({
+    mapRef.current = new mapboxgl.Map({
+      //@ts-ignore
       container: mapContainer.current,
       style: 'mapbox://styles/phonofidelic/ckn2dzfo22ys217n4be9x5l3e',
       zoom: 12,
       attributionControl: false,
     });
 
+
+
+    if (!mapRef.current) return;
+
     /**
      * Get current location and possition the map
      */
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        console.log('position:', pos);
+        if (!mapRef.current) return;
+        console.log('Getting pos...')
 
-        map.setCenter([pos.coords.longitude, pos.coords.latitude]);
+        mapRef.current.setCenter([pos.coords.longitude, pos.coords.latitude]);
       },
       (err) => {
         console.error('Could not get position:', err);
       }
     );
 
-    map.on('load', () => {
-      for (const waypoint of route.waypoints) {
 
-        const markerEl = document.createElement('div')
-        markerEl.className = 'marker'
-        markerEl.innerHTML = String(waypoint.index + 1)
+    mapRef.current.on('load', () => {
+      console.log('*** map onload ***')
+    })
 
-        new mapboxgl.Marker(markerEl)
-          .setLngLat(waypoint.coordinates)
-          .addTo(map)
-      }
+    /**
+     * Register map interaction events
+     */
+    mapRef.current.on('dblclick', (event: MapMouseEvent) => {
+      /**
+       * Render new Waypoint marker
+       */
+      const route = handleDblClick(event)
+      if (!route) return
+      const waypoint = route.waypoints[route.waypoints.length - 1]
+      console.log('on dblclick, waypoint:', waypoint)
+      console.log('on dblclick, route:', route)
+      if (!waypoint) return;
 
-      let routeCoords = []
-      for (let i = 0; i < route.waypoints.length - 1; i++) {
-        routeCoords.push([route.waypoints[i].coordinates[0], route.waypoints[i].coordinates[1]])
-        routeCoords.push([route.waypoints[i + 1].coordinates[0], route.waypoints[i + 1].coordinates[1]])
-      }
+      const markerEl = document.createElement('div')
+      markerEl.className = 'marker'
+      markerEl.innerHTML = String(waypoint.index + 1)
 
-      map.addSource('route', {
+      new mapboxgl.Marker(markerEl)
+        .setLngLat(waypoint.coordinates)
+        .addTo(mapRef.current!)
+
+      /**
+       * Render path line
+       */
+      if (waypoint.index < 1) return;
+      if (!mapRef.current) return;
+
+      mapRef.current.addSource(`route_${waypoint.index}`, {
         type: 'geojson',
         data: {
           type: 'Feature',
           properties: {},
           geometry: {
             type: 'LineString',
-            coordinates: routeCoords
+            coordinates: [
+              route.waypoints[waypoint.index - 1].coordinates,
+              waypoint.coordinates,
+            ]
           }
         }
       })
-      map.addLayer({
-        id: 'route',
+      mapRef.current.addLayer({
+        id: `route_${waypoint.index}`,
         type: 'line',
-        source: 'route',
+        source: `route_${waypoint.index}`,
         layout: {
           'line-join': 'round',
           'line-cap': 'round'
@@ -82,8 +114,12 @@ export default function Map({ route }: MapProps) {
       })
     })
 
-    return () => map.remove();
-  }, [route.waypoints])
+    return () => {
+      if (!mapRef.current) return;
+      mapRef.current.remove()
+    };
+  })
+
   return (
     <>
       <div ref={mapContainer} id="map-container" className="map-container" style={{
