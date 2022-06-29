@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import mapboxgl, { LngLat, Map as _Map, MapMouseEvent } from 'mapbox-gl';
+import mapboxgl, { LngLat, Map as _Map, MapMouseEvent, Marker } from 'mapbox-gl';
 import { Waypoint } from '../common/interfaces';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN || ''
@@ -61,6 +61,8 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
   }, [])
 
   useEffect(() => {
+    let markers: Marker[] = [];
+    let pathIds: string[] = []
     if (!mapRef.current) return;
 
     for (const waypoint of waypoints) {
@@ -69,14 +71,17 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
       markerEl.className = 'marker'
       markerEl.innerHTML = String(waypoint.index + 1)
 
-      new mapboxgl.Marker(markerEl)
+      const marker = new mapboxgl.Marker(markerEl)
         .setLngLat(waypoint.coordinates)
         .addTo(mapRef.current)
 
+      markers.push(marker)
+
       if (waypoint.index > 0 && mapRef.current !== null) {
         const timestamp = Date.now()
+        const pathId = `route_${waypoint.index}_${timestamp}`
         console.log('*** waypoints:', waypoints)
-        mapRef.current.addSource(`route_${waypoint.index}_${timestamp}`, {
+        mapRef.current.addSource(pathId, {
           type: 'geojson',
           data: {
             type: 'Feature',
@@ -91,9 +96,9 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
           }
         })
         mapRef.current.addLayer({
-          id: `route_${waypoint.index}_${timestamp}`,
+          id: pathId,
           type: 'line',
-          source: `route_${waypoint.index}_${timestamp}`,
+          source: pathId,
           layout: {
             'line-join': 'round',
             'line-cap': 'round'
@@ -103,7 +108,18 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
             'line-width': 8
           }
         })
+        pathIds.push(pathId)
       }
+    }
+
+    /**
+     * Cleaar map on each re-render
+     */
+    return () => {
+      markers.forEach(marker => marker.remove())
+      pathIds.forEach(pathId => {
+        mapRef.current?.removeLayer(pathId)
+      })
     }
   })
 

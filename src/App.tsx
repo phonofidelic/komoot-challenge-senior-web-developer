@@ -24,6 +24,11 @@ function App() {
     setWaypoints(waypointsRef.current)
   }
 
+  const removeWaypoint = (waypointIndex: number) => {
+    waypointsRef.current = waypointsRef.current.filter((waypoint) => waypoint.index !== waypointIndex)
+    waypointsRef.current = waypointsRef.current.map((waypoint, i) => ({ ...waypoint, index: i, name: `Waypoint ${i + 1}` }))
+    setWaypoints(waypointsRef.current)
+  }
 
   return (
     <Grid container style={{
@@ -39,13 +44,13 @@ function App() {
           <h1>Route Builder</h1>
           <Typography>Double-click a point on the map to add a waypoint.</Typography>
         </div>
-        <WaypointList waypoints={waypoints} />
+        <WaypointList waypoints={waypoints} onRemoveWaypoint={removeWaypoint} />
       </Grid>
       <Grid style={{
         width: '100%',
         height: '100%'
       }} item sm={8}>
-        <Map waypoints={waypoints} onAddWaypoint={addWaypoint} />
+        <Map waypoints={waypointsRef.current} onAddWaypoint={addWaypoint} />
       </Grid>
     </Grid>
   );
