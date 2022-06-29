@@ -1,21 +1,22 @@
 import React, { useEffect, useRef } from 'react'
 import mapboxgl, { LngLat, Map as _Map, MapMouseEvent } from 'mapbox-gl';
-import { Route } from '../common/interfaces';
+import { Waypoint } from '../common/interfaces';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN || ''
 
 type MapProps = {
-  onAddWaypoint(coortinagtes: LngLat): Route | undefined
+  waypoints: Waypoint[]
+  onAddWaypoint(coortinagtes: LngLat, waypoints: Waypoint[]): void
 }
 
-export default function Map({ onAddWaypoint }: MapProps) {
+export default function Map({ waypoints, onAddWaypoint }: MapProps) {
   const mapContainer = useRef(null)
   const mapRef = useRef<_Map | null>(null)
 
-  const handleDblClick = (event: MapMouseEvent): Route | undefined => {
+  const handleDblClick = (event: MapMouseEvent) => {
     event.preventDefault()
     console.log('handleDblClick:', event.lngLat)
-    return onAddWaypoint(event.lngLat)
+    onAddWaypoint(event.lngLat, waypoints)
   }
 
   useEffect(() => {
@@ -33,10 +34,6 @@ export default function Map({ onAddWaypoint }: MapProps) {
       attributionControl: false,
     });
 
-
-
-    if (!mapRef.current) return;
-
     /**
      * Get current location and possition the map
      */
@@ -52,73 +49,65 @@ export default function Map({ onAddWaypoint }: MapProps) {
       }
     );
 
-
-    mapRef.current.on('load', () => {
-      console.log('*** map onload ***')
-    })
-
     /**
      * Register map interaction events
      */
-    mapRef.current.on('dblclick', (event: MapMouseEvent) => {
-      /**
-       * Render new Waypoint marker
-       */
-      const route = handleDblClick(event)
-      if (!route) return
-      const waypoint = route.waypoints[route.waypoints.length - 1]
-      console.log('on dblclick, waypoint:', waypoint)
-      console.log('on dblclick, route:', route)
-      if (!waypoint) return;
+    mapRef.current.on('dblclick', handleDblClick)
 
+    return () => {
+      if (!mapRef.current) return;
+      mapRef.current.remove()
+    };
+  }, [])
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    for (const waypoint of waypoints) {
+      console.log('useEffect 2, waypoints:', waypoints)
       const markerEl = document.createElement('div')
       markerEl.className = 'marker'
       markerEl.innerHTML = String(waypoint.index + 1)
 
       new mapboxgl.Marker(markerEl)
         .setLngLat(waypoint.coordinates)
-        .addTo(mapRef.current!)
+        .addTo(mapRef.current)
 
-      /**
-       * Render path line
-       */
-      if (waypoint.index < 1) return;
-      if (!mapRef.current) return;
-
-      mapRef.current.addSource(`route_${waypoint.index}`, {
-        type: 'geojson',
-        data: {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: [
-              route.waypoints[waypoint.index - 1].coordinates,
-              waypoint.coordinates,
-            ]
+      if (waypoint.index > 0 && mapRef.current !== null) {
+        const timestamp = Date.now()
+        console.log('*** waypoints:', waypoints)
+        mapRef.current.addSource(`route_${waypoint.index}_${timestamp}`, {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                waypoints[waypoint.index - 1].coordinates,
+                waypoint.coordinates,
+              ]
+            }
           }
-        }
-      })
-      mapRef.current.addLayer({
-        id: `route_${waypoint.index}`,
-        type: 'line',
-        source: `route_${waypoint.index}`,
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        paint: {
-          'line-color': '#1086E8',
-          'line-width': 8
-        }
-      })
-    })
-
-    return () => {
-      if (!mapRef.current) return;
-      mapRef.current.remove()
-    };
+        })
+        mapRef.current.addLayer({
+          id: `route_${waypoint.index}_${timestamp}`,
+          type: 'line',
+          source: `route_${waypoint.index}_${timestamp}`,
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#1086E8',
+            'line-width': 8
+          }
+        })
+      }
+    }
   })
+
+  console.log('Map, waypoints:', waypoints)
 
   return (
     <>

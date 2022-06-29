@@ -1,32 +1,29 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import './App.css';
 // import { getMockRoute } from './mock';
 import Map from './components/Map';
-import { Route, Waypoint } from './common/interfaces';
-import { Grid } from '@mui/material';
+import { Waypoint } from './common/interfaces';
+import { Grid, Typography } from '@mui/material';
 import { LngLat } from 'mapbox-gl';
+import WaypointList from './components/WaypointList';
 
 
 
 function App() {
-  const route = useRef<Route>({ waypoints: [] })
+  const [waypoints, setWaypoints] = useState<Waypoint[]>([])
+  const waypointsRef = useRef<Waypoint[]>(waypoints)
 
-  const addWaypoint = (coordinates: LngLat): Route | undefined => {
-    if (!route.current) return
-
+  const addWaypoint = (coordinates: LngLat, waypoints: Waypoint[]) => {
     const newWaypoint: Waypoint = {
-      name: `Waypoint ${route.current.waypoints.length + 1}`,
-      index: route.current.waypoints.length,
+      name: `Waypoint ${waypointsRef.current.length + 1}`,
+      index: waypointsRef.current.length,
       coordinates: [coordinates.lng, coordinates.lat]
     }
 
-    route.current = {
-      ...route.current,
-      waypoints: [...route.current.waypoints, newWaypoint]
-    }
-
-    return route.current
+    waypointsRef.current = [...waypointsRef.current, newWaypoint]
+    setWaypoints(waypointsRef.current)
   }
+
 
   return (
     <Grid container style={{
@@ -35,12 +32,20 @@ function App() {
       height: '100vh',
       width: '100%'
     }}>
-      <Grid item sm={4}>SideBar</Grid>
+      <Grid item sm={4}>
+        <div style={{
+          padding: 8
+        }}>
+          <h1>Route Builder</h1>
+          <Typography>Double-click a point on the map to add a waypoint.</Typography>
+        </div>
+        <WaypointList waypoints={waypoints} />
+      </Grid>
       <Grid style={{
         width: '100%',
         height: '100%'
       }} item sm={8}>
-        <Map onAddWaypoint={addWaypoint} />
+        <Map waypoints={waypoints} onAddWaypoint={addWaypoint} />
       </Grid>
     </Grid>
   );
