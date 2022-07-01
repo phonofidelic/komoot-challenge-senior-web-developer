@@ -7,14 +7,13 @@ import { Grid, Typography } from '@mui/material';
 import { LngLat } from 'mapbox-gl';
 import WaypointList from './components/WaypointList';
 
-
-
 function App() {
   const [waypoints, setWaypoints] = useState<Waypoint[]>([])
   const waypointsRef = useRef<Waypoint[]>(waypoints)
 
   const addWaypoint = (coordinates: LngLat, waypoints: Waypoint[]) => {
     const newWaypoint: Waypoint = {
+      id: String(Date.now()),
       name: `Waypoint ${waypointsRef.current.length + 1}`,
       index: waypointsRef.current.length,
       coordinates: [coordinates.lng, coordinates.lat]
@@ -28,6 +27,11 @@ function App() {
     waypointsRef.current = waypointsRef.current.filter((waypoint) => waypoint.index !== waypointIndex)
     waypointsRef.current = waypointsRef.current.map((waypoint, i) => ({ ...waypoint, index: i, name: `Waypoint ${i + 1}` }))
     setWaypoints(waypointsRef.current)
+  }
+
+  const orderWaypoints = (newList: Waypoint[]) => {
+    waypointsRef.current = newList;
+    setWaypoints(newList)
   }
 
   return (
@@ -44,7 +48,11 @@ function App() {
           <h1>Route Builder</h1>
           <Typography>Double-click a point on the map to add a waypoint.</Typography>
         </div>
-        <WaypointList waypoints={waypoints} onRemoveWaypoint={removeWaypoint} />
+        <WaypointList 
+          waypoints={waypoints} 
+          onRemoveWaypoint={removeWaypoint} 
+          onOrderWaypoints={orderWaypoints}
+        />
       </Grid>
       <Grid style={{
         width: '100%',

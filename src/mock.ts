@@ -25,6 +25,7 @@ const generateWaypoints = async (points: number): Promise<Waypoint[]> => {
 
   for (let i = 0; i < points; i++) {
     waypoints.push({
+      id: String(Date.now()),
       name: `Waypoint ${i + 1}`,
       index: i,
       coordinates: [
