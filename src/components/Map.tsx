@@ -6,7 +6,7 @@ mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN || ''
 
 type MapProps = {
   waypoints: Waypoint[]
-  onAddWaypoint(coortinagtes: LngLat, waypoints: Waypoint[]): void
+  onAddWaypoint(coortinagtes: LngLat): void
 }
 
 export default function Map({ waypoints, onAddWaypoint }: MapProps) {
@@ -16,7 +16,7 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
   const handleDblClick = (event: MapMouseEvent) => {
     event.preventDefault()
     console.log('handleDblClick:', event.lngLat)
-    onAddWaypoint(event.lngLat, waypoints)
+    onAddWaypoint(event.lngLat)
   }
 
   useEffect(() => {

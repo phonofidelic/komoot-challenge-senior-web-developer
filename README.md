@@ -1,51 +1,63 @@
 # Route Builder - komoot challenge
+
 [TODO]
 
 ## Overview
+
 [TODO]
 
 ## Process
 
 ### Requirements
+
 "Develop a react app that enables you to plan your cross country run and download it as GPX file."
-- [ ] `Runners` should be able to place `Waypoints` anywhere on the `Map`
-- [ ] `Waypoints` should also be added to added as list items to the `WaypointList`
+
+- [x] `Runners` should be able to place `Waypoints` anywhere on the `Map`
+- [x] `Waypoints` should also be added to added as list items to the `WaypointList`
 - [ ] `Waypoints` should be able to be moved arround on the `Map`
 - [ ] `Waypoints` should be able to be named and re-named
-- [ ] `Waypoints` should be able to be removed
-- [ ] `Waypoints` should be able to be re-ordered
+- [x] `Waypoints` should be able to be removed
+- [x] `Waypoints` should be able to be re-ordered
 - [ ] `Waypoints` should be connected to form a `Route`
 
-
 ### UI Components
+
 [TODO]
 
 ### Data Model
+
 Types:
+
 ```typescript
 interface Waypoint {
+  id: string;
   name: string;
+  index: number;
   coordinates: [number, number];
-  links: Waypoint[];
 }
 
 interface Route {
-  waypoints: Waypoint[]
+  waypoints: Waypoint[];
 }
 ```
 
 ### Bootstrapping
+
 I bootsraped this project using [Create React App](https://github.com/facebook/create-react-app) which I find to be usefull for quickly spinning up front-end projects when prototyping, but also for longer term projects as it has great developer support and is quite configurable through add-ons like [CRACO](https://github.com/gsoft-inc/craco) (I have not needed to eject in a long time). For more details on Create React App, see the [Development](#development) section below.
 
 ### Testing
-[TODO]
+
+_[TODO]_
 
 ### Deployment
-[TODO]
 
-------------------
+_[TODO]_
+
+---
+
 ## Development
-*The following is copied over from the CRA default README:*
+
+_The following is copied over from the CRA default README:_
 
 ## Getting Started with Create React App
 

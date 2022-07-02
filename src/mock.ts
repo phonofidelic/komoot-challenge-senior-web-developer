@@ -35,8 +35,7 @@ const generateWaypoints = async (points: number): Promise<Waypoint[]> => {
         i === 0
           ? startPos.coords.latitude
           : waypoints[i - 1].coordinates[1] + getRandomArbitrary(minDistance, maxDistance) * (Math.random() < 0.5 ? -1 : 1)
-      ],
-      links: []
+      ]
     })
   }
 
