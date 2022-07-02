@@ -65,8 +65,7 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
     let pathIds: string[] = []
     if (!mapRef.current) return;
 
-    for (const waypoint of waypoints) {
-      console.log('useEffect 2, waypoints:', waypoints)
+    for (const [i, waypoint] of waypoints.entries()) {
       const markerEl = document.createElement('div')
       markerEl.className = 'marker'
       markerEl.innerHTML = String(waypoint.index + 1)
@@ -77,10 +76,9 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
 
       markers.push(marker)
 
-      if (waypoint.index > 0 && mapRef.current !== null) {
+      if (i > 0 && mapRef.current !== null) {
         const timestamp = Date.now()
-        const pathId = `route_${waypoint.index}_${timestamp}`
-        console.log('*** waypoints:', waypoints)
+        const pathId = `route_${waypoint.id}_${timestamp}`
         mapRef.current.addSource(pathId, {
           type: 'geojson',
           data: {
@@ -89,7 +87,7 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
             geometry: {
               type: 'LineString',
               coordinates: [
-                waypoints[waypoint.index - 1].coordinates,
+                waypoints[i - 1].coordinates,
                 waypoint.coordinates,
               ]
             }
@@ -122,8 +120,6 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
       })
     }
   })
-
-  console.log('Map, waypoints:', waypoints)
 
   return (
     <>

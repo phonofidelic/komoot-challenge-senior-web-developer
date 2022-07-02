@@ -1,9 +1,8 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { Waypoint } from '../common/interfaces'
-import { IconButton, List, ListItem, ListItemButton, ListItemText } from '@mui/material'
+import { IconButton, List, ListItem, ListItemText } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete';
 import MenuIcon from '@mui/icons-material/Menu';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 type WaypointListProps = {
   waypoints: Waypoint[]
@@ -11,64 +10,70 @@ type WaypointListProps = {
   onOrderWaypoints(newList: Waypoint[]): void
 }
 
-
-
 export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypoints }: WaypointListProps) {
-  const handleDrop = (droppedItem: any) => {
-    /**
-     * Adapted from: https://contactmentor.com/react-drag-drop-list/
-     */
-    if (!droppedItem.destination) return;
-    console.log('*** droppedItem:', droppedItem)
+  const dragItem = useRef<number | null>(null)
+  const dragOverItem = useRef<number | null>(null)
+
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+
+  const handleDragStart = (event: React.DragEvent<HTMLLIElement>, index: number) => {
+    dragItem.current = index;
+    setDragIndex(index)
+  }
+
+  const handleDragEnter = (event: React.DragEvent<HTMLLIElement>, index: number) => {
+    event.preventDefault()
+    dragOverItem.current = index;
+    setDragOverIndex(index)
+  }
+
+  const handleDrop = (event: React.DragEvent<HTMLLIElement>) => {
+    event.preventDefault()
+    if (dragItem.current === null || dragOverItem.current === null) return
+
     let updatedList = [...waypoints]
-    const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1)
-    updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
+    const [reorderedItem] = updatedList.splice(dragItem.current, 1)
+    updatedList.splice(dragOverItem.current, 0, reorderedItem)
 
-    const finalList = updatedList.map((item, index) => ({
-      ...item,
-      name: `Waypoint ${index + 1}`,
-      index
-    }))
+    onOrderWaypoints(updatedList)
 
-    onOrderWaypoints(finalList)
+    dragItem.current = null
+    dragOverItem.current = null
+    setDragIndex(null)
+    setDragOverIndex(null)
   }
 
   return (
-    <DragDropContext onDragEnd={handleDrop}>
-      <Droppable droppableId="list-container">
-        {(provided) => (
-          <List id="list-container" ref={provided.innerRef} {...provided.droppableProps}>
-            {waypoints.map((waypoint, i) => (
-              <Draggable key={waypoint.id} draggableId={waypoint.id} index={i}>
-                {(provided) => (
-                  <ListItem
-                    style={{
-                      cursor: 'pointer'
-                    }}
-                    ref={provided.innerRef}
-                    {...provided.dragHandleProps}
-                    {...provided.draggableProps}
-                    secondaryAction={
-                      <IconButton onClick={() => onRemoveWaypoint(waypoint.index)}>
-                        <DeleteIcon style={{ color: '#747474' }} />
-                      </IconButton>
-                    }
-                  >
-                    <MenuIcon style={{ 
-                      color: '#747474', 
-                      marginRight: 16,
-                      cursor: 'grab'
-                    }} />
-                    <ListItemText>{waypoint.name}</ListItemText>
-                  </ListItem>
-                )}
-              </Draggable>
-              
-            ))}
-          </List>
-        )}
-      </Droppable>
-      
-    </DragDropContext>
+    <List>
+      {waypoints.map((waypoint, i) => (
+        <ListItem
+          key={waypoint.id}
+          draggable
+          style={{
+            cursor: 'pointer',
+            opacity: dragIndex === i ? '0.5' : 'unset',
+            backgroundColor: dragOverIndex === i ? '#819248' : '#383838',
+            borderBottom: dragOverIndex === i ? '2px solid #C3E452' : 'none'
+          }}
+          secondaryAction={
+            <IconButton onClick={() => onRemoveWaypoint(waypoint.index)}>
+              <DeleteIcon style={{ color: '#747474' }} />
+            </IconButton>
+          }
+          onDragStart={(event) => handleDragStart(event, i)}
+          onDragEnter={(event) => handleDragEnter(event, i)}
+          onDragEnd={handleDrop}
+          onDragOver={(e) => e.preventDefault()}
+        >
+          <MenuIcon style={{ 
+            color: '#747474', 
+            marginRight: 16,
+            cursor: 'grab'
+          }} />
+          <ListItemText>{waypoint.name}</ListItemText>
+        </ListItem>              
+      ))}
+    </List>
   )
 }

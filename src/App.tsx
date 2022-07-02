@@ -94,7 +94,7 @@ function App() {
           <h1>Route Builder</h1>
           <Typography>Double-click a point on the map to add a waypoint.</Typography>
         </div>
-        <div style={{ flex: 1, overflowY: 'scroll' }}>
+        <div style={{ flex: 1, overflowY: 'auto' }}>
         <WaypointList 
           waypoints={waypoints} 
           onRemoveWaypoint={removeWaypoint} 
