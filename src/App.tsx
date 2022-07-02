@@ -55,11 +55,19 @@ function App() {
 
     if (!gpxData || !gpxData.attributes || !gpxData.wpt) return
 
-    const xml = '<?xml version="1.0" encoding="UTF-8"?>' + 
-      `\n<gpx ${Object.keys(gpxData.attributes).map(attributeKey => `${attributeKey}="${gpxData.attributes![attributeKey]}"`).join(' ')}` + '>\n'
-      + gpxData.wpt.map(waypoint => (`<wpt lat="${waypoint.attributes.lat}" lon="${waypoint.attributes.lon}">\n<name>${waypoint.name}</name>\n</wpt>`)).join('\n')
-      + `<trk><trkseg>${gpxData.wpt.map(waypoint => (`<trkpt lat="${waypoint.attributes.lat}" lon="${waypoint.attributes.lon}"></trkpt>`)).join('\n')}</trkseg></trk>`
-      +'\n</gpx>'
+    const xml = 
+    `<?xml version="1.0" encoding="UTF-8"?>
+<gpx ${Object.keys(gpxData.attributes).map(attributeKey => `${attributeKey}="${gpxData.attributes![attributeKey]}"`).join(' ')}>
+  ${gpxData.wpt.map(waypoint => (
+  `<wpt lat="${waypoint.attributes.lat}" lon="${waypoint.attributes.lon}">
+    <name>${waypoint.name}</name>
+  </wpt>`)).join('\n    ')}
+  <trk>
+    <trkseg>
+      ${gpxData.wpt.map(waypoint => (`<trkpt lat="${waypoint.attributes.lat}" lon="${waypoint.attributes.lon}"></trkpt>`)).join('\n         ')}
+    </trkseg>
+  </trk>
+</gpx>`
 
     console.log(xml)
 
@@ -92,7 +100,7 @@ function App() {
           padding: 8
         }}>
           <h1>Route Builder</h1>
-          <Typography>Double-click a point on the map to add a waypoint.</Typography>
+          <Typography variant="caption">Double-click a point on the map to add a waypoint.</Typography>
         </div>
         <div style={{ flex: 1, overflowY: 'auto' }}>
         <WaypointList 
@@ -113,8 +121,9 @@ function App() {
               borderRadius: 6,
               backgroundColor: '#C3E452',
               border: 'none',
-              cursor: 'pointer'
-            }} 
+              cursor: 'pointer',
+            }}
+            disabled={!waypoints.length}
             onClick={downloadRoute}
           >
             <Typography><b>Download your route</b></Typography>

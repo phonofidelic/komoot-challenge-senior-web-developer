@@ -15,7 +15,6 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
 
   const handleDblClick = (event: MapMouseEvent) => {
     event.preventDefault()
-    console.log('handleDblClick:', event.lngLat)
     onAddWaypoint(event.lngLat)
   }
 
@@ -58,6 +57,7 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
       if (!mapRef.current) return;
       mapRef.current.remove()
     };
+    // eslint-disable-next-line
   }, [])
 
   useEffect(() => {

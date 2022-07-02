@@ -13,12 +13,13 @@
 "Develop a react app that enables you to plan your cross country run and download it as GPX file."
 
 - [x] `Runners` should be able to place `Waypoints` anywhere on the `Map`
-- [x] `Waypoints` should also be added to added as list items to the `WaypointList`
+- [x] `Waypoints` should also be added as list items to the `WaypointList`
 - [ ] `Waypoints` should be able to be moved arround on the `Map`
 - [ ] `Waypoints` should be able to be named and re-named
 - [x] `Waypoints` should be able to be removed
 - [x] `Waypoints` should be able to be re-ordered
-- [ ] `Waypoints` should be connected to form a `Route`
+- [x] `Waypoints` should be connected to form a `Route`
+- [x] The `Route` should be downloadable as a GPX file
 
 ### UI Components
 
