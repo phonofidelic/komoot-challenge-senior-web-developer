@@ -14,7 +14,7 @@
 
 - [x] `Runners` should be able to place `Waypoints` anywhere on the `Map`
 - [x] `Waypoints` should also be added as list items to the `WaypointList`
-- [ ] `Waypoints` should be able to be moved arround on the `Map`
+- [x] `Waypoints` should be able to be moved arround on the `Map`
 - [ ] `Waypoints` should be able to be named and re-named
 - [x] `Waypoints` should be able to be removed
 - [x] `Waypoints` should be able to be re-ordered

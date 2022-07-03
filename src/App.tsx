@@ -35,6 +35,15 @@ function App() {
     setWaypoints(newList)
   }
 
+  const moveWaypoint = (movedWaypoint: Waypoint) => {
+    waypointsRef.current = waypointsRef.current.map((waypoint) => waypoint.id === movedWaypoint.id ? ({
+      ...waypoint,
+      coordinates: movedWaypoint.coordinates
+    }): waypoint)
+
+    setWaypoints(waypointsRef.current)
+  }
+
   const downloadRoute = () => {
     const { Point } = BaseBuilder.MODELS
     const gpxBuilder = new BaseBuilder()
@@ -134,7 +143,11 @@ function App() {
         width: '100%',
         height: '100%'
       }} item sm={8}>
-        <Map waypoints={waypointsRef.current} onAddWaypoint={addWaypoint} />
+        <Map 
+          waypoints={waypointsRef.current} 
+          onAddWaypoint={addWaypoint}
+          onMoveWaypoint={moveWaypoint} 
+        />
       </Grid>
     </Grid>
   );

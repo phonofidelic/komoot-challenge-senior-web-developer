@@ -54,7 +54,7 @@ export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypo
             cursor: 'pointer',
             opacity: dragIndex === i ? '0.5' : 'unset',
             backgroundColor: dragOverIndex === i ? '#819248' : '#383838',
-            borderBottom: dragOverIndex === i ? '2px solid #C3E452' : 'none'
+            border: dragOverIndex === i ? '2px solid #C3E452' : 'none'
           }}
           secondaryAction={
             <IconButton onClick={() => onRemoveWaypoint(waypoint.index)}>
