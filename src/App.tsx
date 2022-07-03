@@ -35,6 +35,15 @@ function App() {
     setWaypoints(newList)
   }
 
+  const moveWaypoint = (movedWaypoint: Waypoint) => {
+    waypointsRef.current = waypointsRef.current.map((waypoint) => waypoint.id === movedWaypoint.id ? ({
+      ...waypoint,
+      coordinates: movedWaypoint.coordinates
+    }): waypoint)
+
+    setWaypoints(waypointsRef.current)
+  }
+
   const downloadRoute = () => {
     const { Point } = BaseBuilder.MODELS
     const gpxBuilder = new BaseBuilder()
@@ -96,18 +105,30 @@ function App() {
           height: '100%'
         }}
       >
-        <div style={{
-          padding: 8
-        }}>
-          <h1>Route Builder</h1>
-          <Typography variant="caption">Double-click a point on the map to add a waypoint.</Typography>
+        <div style={{ padding: 16 }}>
+          <div style={{ 
+              marginBottom: 16,
+              borderBottom: '4px solid #747474'
+            }}>
+          <h1 
+            
+          >Route Builder</h1>
+          </div>
+          
         </div>
         <div style={{ flex: 1, overflowY: 'auto' }}>
-        <WaypointList 
-          waypoints={waypoints} 
-          onRemoveWaypoint={removeWaypoint} 
-          onOrderWaypoints={orderWaypoints}
-        />
+          {waypoints.length < 1 ? (
+            <div style={{ padding: 16 }}>
+              <Typography variant="caption">Double-click a point on the map to add a waypoint.</Typography>
+            </div>
+          ) : (
+            <WaypointList 
+              waypoints={waypoints} 
+              onRemoveWaypoint={removeWaypoint} 
+              onOrderWaypoints={orderWaypoints}
+            />
+          )}
+        
         </div>
         <div style={{
           width: '100%',
@@ -134,7 +155,11 @@ function App() {
         width: '100%',
         height: '100%'
       }} item sm={8}>
-        <Map waypoints={waypointsRef.current} onAddWaypoint={addWaypoint} />
+        <Map 
+          waypoints={waypointsRef.current} 
+          onAddWaypoint={addWaypoint}
+          onMoveWaypoint={moveWaypoint} 
+        />
       </Grid>
     </Grid>
   );

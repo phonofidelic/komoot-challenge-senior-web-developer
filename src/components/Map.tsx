@@ -5,11 +5,12 @@ import { Waypoint } from '../common/interfaces';
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN || ''
 
 type MapProps = {
-  waypoints: Waypoint[]
-  onAddWaypoint(coortinagtes: LngLat): void
+  waypoints: Waypoint[];
+  onAddWaypoint(coortinagtes: LngLat): void;
+  onMoveWaypoint(waypoint: Waypoint): void;
 }
 
-export default function Map({ waypoints, onAddWaypoint }: MapProps) {
+export default function Map({ waypoints, onAddWaypoint, onMoveWaypoint }: MapProps) {
   const mapContainer = useRef(null)
   const mapRef = useRef<_Map | null>(null)
 
@@ -39,8 +40,6 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         if (!mapRef.current) return;
-        console.log('Getting pos...')
-
         mapRef.current.setCenter([pos.coords.longitude, pos.coords.latitude]);
       },
       (err) => {
@@ -67,18 +66,59 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
 
     for (const [i, waypoint] of waypoints.entries()) {
       const markerEl = document.createElement('div')
+      markerEl.id = `marker_${waypoint.id}`
       markerEl.className = 'marker'
       markerEl.innerHTML = String(waypoint.index + 1)
 
-      const marker = new mapboxgl.Marker(markerEl)
-        .setLngLat(waypoint.coordinates)
+      const marker = new mapboxgl.Marker(markerEl, { draggable: true })
+        .setLngLat(waypoint.coordinates)      
+        .on('drag', (e: any) => {
+          if(!mapRef.current) return
+
+          const fromLine = mapRef.current.getSource(`route_${waypoint.id}`)
+          if (fromLine) {
+            mapRef.current
+              .getSource(`route_${waypoint.id}`)
+              //@ts-ignore
+              .setData({
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: [
+                    waypoints[i - 1].coordinates,
+                    [e.target._lngLat.lng, e.target._lngLat.lat],
+                  ]
+                }
+              })
+          }
+
+          if (waypoints[i+1]) {
+            mapRef.current
+              .getSource(`route_${waypoints[i+1].id}`)
+              //@ts-ignore
+              .setData({
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: [
+                    [e.target._lngLat.lng, e.target._lngLat.lat],
+                    waypoints[i + 1].coordinates,
+                  ]
+                }
+              })
+          }
+        })
+        .on('dragend', (e: any) => {
+          onMoveWaypoint({...waypoint, coordinates: [e.target._lngLat.lng, e.target._lngLat.lat] })
+        })
         .addTo(mapRef.current)
 
       markers.push(marker)
 
       if (i > 0 && mapRef.current !== null) {
-        const timestamp = Date.now()
-        const pathId = `route_${waypoint.id}_${timestamp}`
+        const pathId = `route_${waypoint.id}`
         mapRef.current.addSource(pathId, {
           type: 'geojson',
           data: {
@@ -111,12 +151,13 @@ export default function Map({ waypoints, onAddWaypoint }: MapProps) {
     }
 
     /**
-     * Cleaar map on each re-render
+     * Clear map on each re-render
      */
     return () => {
       markers.forEach(marker => marker.remove())
       pathIds.forEach(pathId => {
-        mapRef.current?.removeLayer(pathId)
+        mapRef.current?.getLayer(pathId) && mapRef.current?.removeLayer(pathId)
+        mapRef.current?.getSource(pathId) && mapRef.current?.removeSource(pathId)
       })
     }
   })
