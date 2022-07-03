@@ -4,13 +4,14 @@ import './App.css';
 import { BaseBuilder } from 'gpx-builder';
 import Map from './components/Map';
 import { Waypoint } from './common/interfaces';
-import { Grid, Typography } from '@mui/material';
+import { Grid, Typography, useMediaQuery } from '@mui/material';
 import { LngLat } from 'mapbox-gl';
 import WaypointList from './components/WaypointList';
 
 function App() {
   const [waypoints, setWaypoints] = useState<Waypoint[]>([])
   const waypointsRef = useRef<Waypoint[]>(waypoints)
+  const isMobile = useMediaQuery('(max-width:600px)');
 
   const addWaypoint = (coordinates: LngLat) => {
     const newWaypoint: Waypoint = {
@@ -102,7 +103,8 @@ function App() {
           display: 'flex',
           flexDirection: 'column',
           alignContent: 'space-between',
-          height: '100%'
+          width: '100%',
+          height: isMobile ? '50%' : '100%'
         }}
       >
         <div style={{ padding: 16 }}>
@@ -130,9 +132,45 @@ function App() {
           )}
         
         </div>
-        <div style={{
-          width: '100%',
-        }}>
+        {!isMobile &&
+          <div style={{
+            width: '100%',
+          }}>
+            <button 
+              style={{ 
+                display: 'block',
+                width: '90%',
+                height: '42px',
+                margin: '16px auto',
+                borderRadius: 6,
+                backgroundColor: '#C3E452',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              disabled={!waypoints.length}
+              onClick={downloadRoute}
+            >
+              <Typography><b>Download your route</b></Typography>
+            </button>
+          </div>
+        }
+      </Grid>
+      <Grid style={{
+        width: '100%',
+        height: isMobile ? '50%' : '100%'
+      }} item sm={8}>
+        <Map 
+          waypoints={waypointsRef.current} 
+          onAddWaypoint={addWaypoint}
+          onMoveWaypoint={moveWaypoint} 
+        />
+        { isMobile && 
+          <div style={{
+            position: 'fixed',
+            bottom: 0,
+            width: '100%',
+            backgroundColor: '#383838'
+          }}>
           <button 
             style={{ 
               display: 'block',
@@ -150,16 +188,7 @@ function App() {
             <Typography><b>Download your route</b></Typography>
           </button>
         </div>
-      </Grid>
-      <Grid style={{
-        width: '100%',
-        height: '100%'
-      }} item sm={8}>
-        <Map 
-          waypoints={waypointsRef.current} 
-          onAddWaypoint={addWaypoint}
-          onMoveWaypoint={moveWaypoint} 
-        />
+      }
       </Grid>
     </Grid>
   );
