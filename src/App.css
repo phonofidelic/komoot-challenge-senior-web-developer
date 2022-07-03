@@ -45,3 +45,11 @@
   border-radius: 100%;
   text-align: center;
 }
+
+.marker:hover {
+  border: 4px solid #c3e452;
+}
+
+.marker.hovered {
+  border: 4px solid #c3e452;
+}

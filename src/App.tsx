@@ -105,18 +105,30 @@ function App() {
           height: '100%'
         }}
       >
-        <div style={{
-          padding: 8
-        }}>
-          <h1>Route Builder</h1>
-          <Typography variant="caption">Double-click a point on the map to add a waypoint.</Typography>
+        <div style={{ padding: 16 }}>
+          <div style={{ 
+              marginBottom: 16,
+              borderBottom: '4px solid #747474'
+            }}>
+          <h1 
+            
+          >Route Builder</h1>
+          </div>
+          
         </div>
         <div style={{ flex: 1, overflowY: 'auto' }}>
-        <WaypointList 
-          waypoints={waypoints} 
-          onRemoveWaypoint={removeWaypoint} 
-          onOrderWaypoints={orderWaypoints}
-        />
+          {waypoints.length < 1 ? (
+            <div style={{ padding: 16 }}>
+              <Typography variant="caption">Double-click a point on the map to add a waypoint.</Typography>
+            </div>
+          ) : (
+            <WaypointList 
+              waypoints={waypoints} 
+              onRemoveWaypoint={removeWaypoint} 
+              onOrderWaypoints={orderWaypoints}
+            />
+          )}
+        
         </div>
         <div style={{
           width: '100%',

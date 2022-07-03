@@ -17,7 +17,7 @@ export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypo
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
-  const handleDragStart = (event: React.DragEvent<HTMLLIElement>, index: number) => {
+  const handleDragStart = (_event: React.DragEvent<HTMLLIElement>, index: number) => {
     dragItem.current = index;
     setDragIndex(index)
   }
@@ -53,8 +53,9 @@ export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypo
           style={{
             cursor: 'pointer',
             opacity: dragIndex === i ? '0.5' : 'unset',
-            backgroundColor: dragOverIndex === i ? '#819248' : '#383838',
-            border: dragOverIndex === i ? '2px solid #C3E452' : 'none'
+            backgroundColor: '#383838',
+            borderBottom: dragIndex !== null && dragIndex < i && dragOverIndex === i ? '2px solid #C3E452' : 'none',
+            borderTop: dragIndex !== null && dragIndex !== waypoints.length && dragIndex > i && dragOverIndex === i ? '2px solid #C3E452' : 'none'
           }}
           secondaryAction={
             <IconButton onClick={() => onRemoveWaypoint(waypoint.index)}>
