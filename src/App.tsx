@@ -4,12 +4,14 @@ import './App.css';
 import { BaseBuilder } from 'gpx-builder';
 import Map from './components/Map';
 import { Waypoint } from './common/interfaces';
-import { Grid, Typography, useMediaQuery } from '@mui/material';
+import { Grid, IconButton, Typography, useMediaQuery } from '@mui/material';
 import { LngLat } from 'mapbox-gl';
 import WaypointList from './components/WaypointList';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 function App() {
   const [waypoints, setWaypoints] = useState<Waypoint[]>([])
+  const [listOpen, setListOpen] = useState(true)
   const waypointsRef = useRef<Waypoint[]>(waypoints)
   const isMobile = useMediaQuery('(max-width:600px)');
 
@@ -91,11 +93,15 @@ function App() {
     document.body.removeChild(element);
   }
 
+  const toggleMobileList = () => {
+    setListOpen(!listOpen)
+  }
+
   return (
     <Grid container style={{
       color: '#fff',
       backgroundColor: '#383838',
-      height: '100vh',
+      height: !isMobile ? '100vh' : 'unset',
       width: '100%'
     }}>
       <Grid item sm={4} 
@@ -104,7 +110,9 @@ function App() {
           flexDirection: 'column',
           alignContent: 'space-between',
           width: '100%',
-          height: isMobile ? '50%' : '100%'
+          height: '100%',
+          zIndex: 1001,
+          backgroundColor: '#383838'
         }}
       >
         <div style={{ padding: 16 }}>
@@ -112,14 +120,19 @@ function App() {
               marginBottom: 16,
               borderBottom: '4px solid #747474'
             }}>
-          <h1 
-            
-          >Route Builder</h1>
+          <h1>Route Builder</h1>
           </div>
           
         </div>
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          {waypoints.length < 1 ? (
+        <div 
+          style={{ 
+            flex: 1, 
+            overflowY: 'auto',
+            maxHeight: isMobile ? (listOpen ? '200px' : 0) : '100%', 
+            transition: 'max-height .4s',
+          }}
+        >
+          { waypoints.length < 1 ? (
             <div style={{ padding: 16 }}>
               <Typography variant="caption">Double-click a point on the map to add a waypoint.</Typography>
             </div>
@@ -130,8 +143,18 @@ function App() {
               onOrderWaypoints={orderWaypoints}
             />
           )}
-        
         </div>
+        { isMobile && waypoints.length > 0 && (
+          <div
+            style={{
+              textAlign: 'center',
+            }}  
+          >
+            <IconButton onClick={toggleMobileList}>
+              {listOpen ? <ExpandLess style={{ color: '#fff'}} /> : <ExpandMore style={{ color: '#fff'}} />}
+            </IconButton>
+          </div>
+        )}
         {!isMobile &&
           <div style={{
             width: '100%',
@@ -144,6 +167,7 @@ function App() {
                 margin: '16px auto',
                 borderRadius: 6,
                 backgroundColor: '#C3E452',
+                color: '#383838',
                 border: 'none',
                 cursor: 'pointer',
               }}
@@ -157,14 +181,16 @@ function App() {
       </Grid>
       <Grid style={{
         width: '100%',
-        height: isMobile ? '50%' : '100%'
+        height: isMobile ? '100vh': '100vh',
+        position: isMobile ? 'fixed': 'inherit',
+        bottom: 0
       }} item sm={8}>
         <Map 
           waypoints={waypointsRef.current} 
           onAddWaypoint={addWaypoint}
           onMoveWaypoint={moveWaypoint} 
         />
-        { isMobile && 
+        { isMobile && waypoints.length > 0 && 
           <div style={{
             position: 'fixed',
             bottom: 0,
@@ -179,6 +205,7 @@ function App() {
               margin: '16px auto',
               borderRadius: 6,
               backgroundColor: '#C3E452',
+              color: '#383838',
               border: 'none',
               cursor: 'pointer',
             }}

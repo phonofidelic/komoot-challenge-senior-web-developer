@@ -17,18 +17,25 @@ export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypo
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
-  const handleDragStart = (_event: React.DragEvent<HTMLLIElement>, index: number) => {
+  const handleDragStart = (
+    event: React.DragEvent<HTMLLIElement | HTMLDivElement>, index: number) => {
+    //@ts-ignore
+    event.target.parentElement.style.opacity = '0.5'
+    //@ts-ignore
+    event.dataTransfer.setDragImage(event.target.parentElement, 0, 0)
+
     dragItem.current = index;
     setDragIndex(index)
   }
 
-  const handleDragEnter = (event: React.DragEvent<HTMLLIElement>, index: number) => {
+  const handleDragEnter = (event: React.DragEvent<HTMLLIElement> | React.TouchEvent<HTMLLIElement>, index: number) => {
+    // console.log('handleDragEnter, event:', event)
     event.preventDefault()
     dragOverItem.current = index;
     setDragOverIndex(index)
   }
 
-  const handleDrop = (event: React.DragEvent<HTMLLIElement>) => {
+  const handleDrop = (event: React.DragEvent<HTMLLIElement> | React.TouchEvent<HTMLLIElement>) => {
     event.preventDefault()
     if (dragItem.current === null || dragOverItem.current === null) return
 
@@ -49,13 +56,12 @@ export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypo
       {waypoints.map((waypoint, i) => (
         <ListItem
           key={waypoint.id}
-          draggable
           style={{
             cursor: 'pointer',
             opacity: dragIndex === i ? '0.5' : 'unset',
             backgroundColor: '#383838',
             borderBottom: dragIndex !== null && dragIndex < i && dragOverIndex === i ? '2px solid #C3E452' : 'none',
-            borderTop: dragIndex !== null && dragIndex !== waypoints.length && dragIndex > i && dragOverIndex === i ? '2px solid #C3E452' : 'none'
+            borderTop: dragIndex !== null && dragIndex !== waypoints.length && dragIndex > i && dragOverIndex === i ? '2px solid #C3E452' : 'none',
           }}
           secondaryAction={
             <IconButton onClick={() => onRemoveWaypoint(waypoint.index)}>
@@ -67,11 +73,16 @@ export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypo
           onDragEnd={handleDrop}
           onDragOver={(e) => e.preventDefault()}
         >
+          <div  
+            id={`drag-handle_${i}`}
+            draggable
+          >
           <MenuIcon style={{ 
             color: '#747474', 
             marginRight: 16,
             cursor: 'grab'
           }} />
+          </div>
           <ListItemText>{waypoint.name}</ListItemText>
         </ListItem>              
       ))}
