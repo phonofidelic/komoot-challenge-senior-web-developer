@@ -1,29 +1,39 @@
 # Route Builder - komoot challenge
 
-[TODO]
+This is my solution for komoot's senior web developer challenge. The assignment is to create a route mapping application for cross-country runners that allows users to plan and download their route as a GPX file. The application is also to be built without the help of 3rd party React components such as react-leaflet or react-dnd.
 
 ## Overview
 
-[TODO]
+A live demo for this project can be seen [here](https://komoot-challenge-phonofidelic.netlify.app/). The app initially asks the user for location permissions to center the map. The user can then double-click a point on the map to add a Waypoint. The Waypoints are added to a sortable list and are joines on the map to form a route. The route can be downloaded as a GPX file and uploaded to another mapping tool such as [gpx.studio](https://gpx.studio/).
+![Image of the resulting user interface](doc_assets/1_result.png)
 
 ## Process
 
 ### Requirements
 
-"Develop a react app that enables you to plan your cross country run and download it as GPX file."
+The requirements for the assignment were summed up as:
+
+"Develop a react app that enables you to plan your cross country run and download it as GPX file.
+
+Cross Country runners are not bound to the streets. Your users can plan their favorite route across fields and hills by just placing markers as waypoints on the map. For detailed planning the same waypoints show up as a list where users can delete and rearrange them until the route is perfect and ready to download. The user interface should be close to the design to the left."
 
 - [x] `Runners` should be able to place `Waypoints` anywhere on the `Map`
 - [x] `Waypoints` should also be added as list items to the `WaypointList`
-- [x] `Waypoints` should be able to be moved arround on the `Map`
+- [x] `Waypoints` should be able to be moved around on the `Map`
 - [ ] `Waypoints` should be able to be named and re-named
 - [x] `Waypoints` should be able to be removed
 - [x] `Waypoints` should be able to be re-ordered
 - [x] `Waypoints` should be connected to form a `Route`
 - [x] The `Route` should be downloadable as a GPX file
 
+### Wireframe
+
+I started out by creating [a basic wireframe in Figma](https://www.figma.com/file/7jmBDH5miljxU8xOZpW95f/Untitled?node-id=0%3A1) in order to help clarify the requirements and discern some of the basic UI components that would be needed:
+![Wireframe created in Figma](doc_assets/2_wireframe.png)
+
 ### UI Components
 
-[TODO]
+_[TODO]_
 
 ### Data Model
 
@@ -44,7 +54,7 @@ interface Route {
 
 ### Bootstrapping
 
-I bootsraped this project using [Create React App](https://github.com/facebook/create-react-app) which I find to be usefull for quickly spinning up front-end projects when prototyping, but also for longer term projects as it has great developer support and is quite configurable through add-ons like [CRACO](https://github.com/gsoft-inc/craco) (I have not needed to eject in a long time). For more details on Create React App, see the [Development](#development) section below.
+I bootstrapped this project using [Create React App](https://github.com/facebook/create-react-app) which I find to be useful for quickly spinning up front-end projects when prototyping, but also for longer term projects as it has great developer support and is quite configurable through add-ons like [CRACO](https://github.com/gsoft-inc/craco) (I have not needed to eject in a long time). For more details on Create React App, see the [Development](#development) section below.
 
 ### Testing
 
@@ -52,7 +62,7 @@ _[TODO]_
 
 ### Deployment
 
-_[TODO]_
+The web app is deployed to [Netlify](https://www.netlify.com/) on succesfull merges to `main`. A live demo of the app can be seen [here](https://komoot-challenge-phonofidelic.netlify.app/).
 
 ---
 
