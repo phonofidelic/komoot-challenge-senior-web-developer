@@ -1,21 +1,82 @@
 import React, { useRef, useState } from 'react';
 import './App.css';
+import styled from 'styled-components'
 // import { getMockRoute } from './mock';
-import { BaseBuilder } from 'gpx-builder';
 import Map from './components/Map';
 import { Waypoint } from './common/interfaces';
-import { Grid, IconButton, Typography, useMediaQuery } from '@mui/material';
+import { Grid } from '@mui/material';
 import { LngLat } from 'mapbox-gl';
 import WaypointList from './components/WaypointList';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { downloadRoute } from './utils';
 import DownloadButton from './components/DownloadButton';
 
+const Container = styled(Grid)`
+  color: #fff;
+  background-color: #383838;
+  height: 100vh;
+  width: 100%;
+  @media (max-width: 600px) {
+    height: unset;
+  }
+`
+const SideBarContainer = styled(Grid)`
+  display: flex;
+  flex-direction: column!important;
+  align-content: space-between;
+  width: 100%;
+  height: 100%;
+  z-index: 1001;
+  background-color: #383838;
+`
+const HeaderContainer = styled.div`
+  padding: 0 16px;
+  & > div {
+    margin-bottom: 16px;
+    border-bottom: 4px solid #747474;
+  }
+`
+const WaypointListContainer = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  max-height: 100%;
+  transition: max-height .4s ease-in-out;
+  @media (max-width: 600px) {
+    max-height: ${(props: { listOpen: boolean }) => props.listOpen ? '200px' : '0px'};
+  }
+`
+const MenuToggleButton = styled.button`
+  display: none;
+  @media (max-width: 600px) {
+    display: block;
+    text-align: center;
+    width: 100%;
+    background-color: #383838;
+    border: none;
+  }
+`
+const DownloadButtonContainer = styled.div`
+  width: 100%;
+  background-color: #383838;
+  @media (max-width: 600px) {
+    position: fixed;
+    bottom: 0;
+    display: ${(props: {hide?: boolean}) => props.hide ? 'none' : 'block'};
+  }
+`
+const MapContainer = styled(Grid)`
+  width: 100%;
+  height: 100vh;
+  @media (max-width: 600px) {
+    position: fixed;
+    bottom: 0;
+  }
+`
+
 function App() {
   const [waypoints, setWaypoints] = useState<Waypoint[]>([])
   const [listOpen, setListOpen] = useState(true)
   const waypointsRef = useRef<Waypoint[]>(waypoints)
-  const isMobile = useMediaQuery('(max-width:600px)');
 
   const addWaypoint = (coordinates: LngLat) => {
     const newWaypoint: Waypoint = {
@@ -58,94 +119,37 @@ function App() {
   }
 
   return (
-    <Grid container style={{
-      color: '#fff',
-      backgroundColor: '#383838',
-      height: !isMobile ? '100vh' : 'unset',
-      width: '100%'
-    }}>
-      <Grid item sm={4} 
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignContent: 'space-between',
-          width: '100%',
-          height: '100%',
-          zIndex: 1001,
-          backgroundColor: '#383838'
-        }}
-      >
-        <div style={{ padding: 16 }}>
-          <div style={{ 
-              marginBottom: 16,
-              borderBottom: '4px solid #747474'
-            }}>
-          <h1>Route Builder</h1>
+    <Container container>
+      <SideBarContainer item sm={4}>
+        <HeaderContainer>
+          <div>
+            <h1>Route Builder</h1>
           </div>
-          
-        </div>
-        <div 
-          style={{ 
-            flex: 1, 
-            overflowY: 'auto',
-            maxHeight: isMobile ? (listOpen ? '200px' : 0) : '100%', 
-            transition: 'max-height .4s',
-          }}
-        >
-          { waypoints.length < 1 ? (
-            <div style={{ padding: 16 }}>
-              <Typography variant="caption">Double-click a point on the map to add a waypoint.</Typography>
-            </div>
-          ) : (
-            <WaypointList 
-              waypoints={waypoints} 
-              onRemoveWaypoint={removeWaypoint} 
-              onOrderWaypoints={orderWaypoints}
-            />
-          )}
-        </div>
-        { isMobile && waypoints.length > 0 && (
-          <div
-            style={{
-              textAlign: 'center',
-            }}  
-          >
-            <IconButton onClick={toggleMobileList}>
-              {listOpen ? <ExpandLess style={{ color: '#fff'}} /> : <ExpandMore style={{ color: '#fff'}} />}
-            </IconButton>
-          </div>
-        )}
-        {!isMobile &&
-          <div style={{
-            width: '100%',
-          }}>
-            <DownloadButton disabled={waypoints.length > 0} onDownload={handleRouteDownload} />
-          </div>
+        </HeaderContainer>
+        <WaypointListContainer listOpen={listOpen}>
+          <WaypointList 
+            waypoints={waypoints} 
+            onRemoveWaypoint={removeWaypoint} 
+            onOrderWaypoints={orderWaypoints}
+          />
+        </WaypointListContainer>
+        { waypoints.length > 0 &&
+          <MenuToggleButton onClick={toggleMobileList}>
+            {listOpen ? <ExpandLess style={{ color: '#fff'}} /> : <ExpandMore style={{ color: '#fff'}} />}
+          </MenuToggleButton>
         }
-      </Grid>
-      <Grid style={{
-        width: '100%',
-        height: isMobile ? '100vh': '100vh',
-        position: isMobile ? 'fixed': 'inherit',
-        bottom: 0
-      }} item sm={8}>
+        <DownloadButtonContainer hide={waypoints.length < 1}>
+          <DownloadButton disabled={waypoints.length < 1} onDownload={handleRouteDownload} />
+        </DownloadButtonContainer>
+      </SideBarContainer>      
+      <MapContainer item sm={8}>
         <Map 
           waypoints={waypointsRef.current} 
           onAddWaypoint={addWaypoint}
           onMoveWaypoint={moveWaypoint} 
         />
-        { isMobile && waypoints.length > 0 && 
-          <div style={{
-            position: 'fixed',
-            bottom: 0,
-            width: '100%',
-            backgroundColor: '#383838'
-          }}>
-          <DownloadButton disabled={waypoints.length > 0} onDownload={handleRouteDownload} />
-        </div>
-      }
-      </Grid>
-    </Grid>
+      </MapContainer>
+    </Container>
   );
 }
 

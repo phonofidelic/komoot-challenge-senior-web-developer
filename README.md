@@ -33,7 +33,7 @@ I started out by creating [a basic wireframe in Figma](https://www.figma.com/fil
 
 ### UI Components
 
-_[TODO]_
+The [Material UI](https://mui.com/) component library was used as the base for list items, grid layout and icons. Styling was achieved using a combination of [styled-components](https://styled-components.com/) and inline CSS in JSX.
 
 ### Data Model
 
@@ -58,7 +58,7 @@ I bootstrapped this project using [Create React App](https://github.com/facebook
 
 ### Testing
 
-_[TODO]_
+_TODO: unit tests to be set up using [Jest](https://jestjs.io/) and [Testing Library](https://testing-library.com/)_
 
 ### Deployment
 
