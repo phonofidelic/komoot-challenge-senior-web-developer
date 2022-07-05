@@ -29,7 +29,8 @@ export default function Map({ waypoints, onAddWaypoint, onMoveWaypoint }: MapPro
     mapRef.current = new mapboxgl.Map({
       //@ts-ignore
       container: mapContainer.current,
-      style: 'mapbox://styles/phonofidelic/ckn2dzfo22ys217n4be9x5l3e',
+      // style: 'mapbox://styles/phonofidelic/ckn2dzfo22ys217n4be9x5l3e',
+      style: 'mapbox://styles/mapbox/outdoors-v11',
       zoom: 12,
       attributionControl: false,
     });

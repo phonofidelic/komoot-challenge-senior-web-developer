@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { Waypoint } from '../common/interfaces'
-import { IconButton, List, ListItem, ListItemText } from '@mui/material'
+import { IconButton, List, ListItem, ListItemText, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete';
 import MenuIcon from '@mui/icons-material/Menu';
 
@@ -13,7 +13,6 @@ type WaypointListProps = {
 export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypoints }: WaypointListProps) {
   const dragItem = useRef<number | null>(null)
   const dragOverItem = useRef<number | null>(null)
-
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
@@ -29,7 +28,6 @@ export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypo
   }
 
   const handleDragEnter = (event: React.DragEvent<HTMLLIElement> | React.TouchEvent<HTMLLIElement>, index: number) => {
-    // console.log('handleDragEnter, event:', event)
     event.preventDefault()
     dragOverItem.current = index;
     setDragOverIndex(index)
@@ -50,6 +48,12 @@ export default function WaypointList({ waypoints, onRemoveWaypoint, onOrderWaypo
     setDragIndex(null)
     setDragOverIndex(null)
   }
+
+  if (!waypoints.length) return (
+    <div style={{ padding: 16 }}>
+      <Typography variant="caption">Double-click a point on the map to add a waypoint.</Typography>
+    </div>
+  )
 
   return (
     <List>
