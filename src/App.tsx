@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import './App.css';
 import styled from 'styled-components'
 // import { getMockRoute } from './mock';
@@ -74,11 +74,22 @@ const MapContainer = styled(Grid)`
 `
 
 function App() {
-  const [waypoints, setWaypoints] = useState<Waypoint[]>([])
+  /**
+   * 'forceUpdate' may be an anti-pattern. It is being used here
+   * to trigger a re-render once the state held in waypointsRef has
+   * been updated.
+   * 
+   * See:
+   * https://www.smashingmagazine.com/2020/11/react-useref-hook/#forcing-a-deep-re-render-for-useref-update
+   * https://stackoverflow.com/a/53215514
+   */
+  const [, setWaypoints] = useState<Waypoint[]>([])
+  const forceUpdate = useCallback(() => setWaypoints([]), [])
+  const waypointsRef = useRef<Waypoint[]>([])
   const [listOpen, setListOpen] = useState(true)
-  const waypointsRef = useRef<Waypoint[]>(waypoints)
 
   const addWaypoint = (coordinates: LngLat) => {
+    console.log('add waypoint')
     const newWaypoint: Waypoint = {
       id: String(Date.now()),
       name: `Waypoint ${waypointsRef.current.length + 1}`,
@@ -87,18 +98,20 @@ function App() {
     }
 
     waypointsRef.current = [...waypointsRef.current, newWaypoint]
-    setWaypoints(waypointsRef.current)
+    forceUpdate()
   }
 
   const removeWaypoint = (waypointIndex: number) => {
     waypointsRef.current = waypointsRef.current.filter((waypoint) => waypoint.index !== waypointIndex)
     waypointsRef.current = waypointsRef.current.map((waypoint, i) => ({ ...waypoint, index: i, name: `Waypoint ${i + 1}` }))
-    setWaypoints(waypointsRef.current)
+    
+    forceUpdate()
   }
 
   const orderWaypoints = (newList: Waypoint[]) => {
     waypointsRef.current = newList;
-    setWaypoints(newList)
+    
+    forceUpdate()
   }
 
   const moveWaypoint = (movedWaypoint: Waypoint) => {
@@ -107,11 +120,11 @@ function App() {
       coordinates: movedWaypoint.coordinates
     }): waypoint)
 
-    setWaypoints(waypointsRef.current)
+    forceUpdate()
   }
 
   const handleRouteDownload = () => {
-    downloadRoute(waypoints)
+    downloadRoute(waypointsRef.current)
   }
 
   const toggleMobileList = () => {
@@ -128,18 +141,18 @@ function App() {
         </HeaderContainer>
         <WaypointListContainer listOpen={listOpen}>
           <WaypointList 
-            waypoints={waypoints} 
+            waypoints={waypointsRef.current} 
             onRemoveWaypoint={removeWaypoint} 
             onOrderWaypoints={orderWaypoints}
           />
         </WaypointListContainer>
-        { waypoints.length > 0 &&
+        { waypointsRef.current.length > 0 &&
           <MenuToggleButton onClick={toggleMobileList}>
             {listOpen ? <ExpandLess style={{ color: '#fff'}} /> : <ExpandMore style={{ color: '#fff'}} />}
           </MenuToggleButton>
         }
-        <DownloadButtonContainer hide={waypoints.length < 1}>
-          <DownloadButton disabled={waypoints.length < 1} onDownload={handleRouteDownload} />
+        <DownloadButtonContainer hide={waypointsRef.current.length < 1}>
+          <DownloadButton disabled={waypointsRef.current.length < 1} onDownload={handleRouteDownload} />
         </DownloadButtonContainer>
       </SideBarContainer>      
       <MapContainer item sm={8}>
