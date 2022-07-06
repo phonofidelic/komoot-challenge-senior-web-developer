@@ -36,7 +36,8 @@ export default function Map({ waypoints, onAddWaypoint, onMoveWaypoint }: MapPro
     });
 
     /**
-     * Get current location and possition the map
+     * Get current location and position the map.
+     * Set default map position and zoom if the user rejects location permissions.
      */
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -45,6 +46,8 @@ export default function Map({ waypoints, onAddWaypoint, onMoveWaypoint }: MapPro
       },
       (err) => {
         console.error('Could not get position:', err);
+        if (!mapRef.current) return;
+        mapRef.current.setCenter([0,0]).setZoom(0);
       }
     );
 
